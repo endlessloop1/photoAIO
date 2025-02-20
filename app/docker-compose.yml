@@ -38,6 +38,8 @@ services:
     depends_on:
       - db
       - redis
+    networks:
+      - app-network
 
   db:
     image: postgres:15-alpine
@@ -47,11 +49,20 @@ services:
       - POSTGRES_DB=photoapp
       - POSTGRES_USER=photoapp
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    networks:
+      - app-network
 
   redis:
     image: redis:7-alpine
     volumes:
       - ./data/redis:/data
+    networks:
+      - app-network
+
+# Define networks at the bottom of the file
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   node_modules: 
