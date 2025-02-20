@@ -1,1 +1,54 @@
- 
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../config/docker/frontend.Dockerfile
+      target: development
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:8000
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../config/docker/backend.Dockerfile
+      target: development
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./config:/config
+      - ${PHOTOS_PATH}:/photos:ro
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=photoapp
+      - POSTGRES_USER=photoapp
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - PHOTOS_ROOT=/photos
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=photoapp
+      - POSTGRES_USER=photoapp
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - ./data/redis:/data
+
+volumes:
+  node_modules: 
