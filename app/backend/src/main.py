@@ -1,7 +1,9 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import text
-from redis import Redis
+from sqlalchemy.ext.asyncio import AsyncSession
+from .core.database import get_db
+from .core.config import get_settings
+import redis.asyncio as redis
 import os
 
 app = FastAPI(title="PhotoApp Backend")
@@ -15,22 +17,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Database dependencies
-async def get_db():
-    from sqlalchemy import create_engine
-    engine = create_engine(os.getenv("DATABASE_URL"))
-    return engine.connect()
-
-async def get_redis():
-    return Redis.from_url(os.getenv("REDIS_URL"))
+# Redis connection
+redis_client = redis.from_url(os.getenv("REDIS_URL"))
 
 @app.get("/system/status")
-async def system_status(
-    db = Depends(get_db),
-    redis = Depends(get_redis)
-):
-    db_status = "ok" if await db.execute(text("SELECT 1")) else "error"
-    redis_status = "ok" if redis.ping() else "error"
+async def system_status(db: AsyncSession = Depends(get_db)):
+    try:
+        await db.execute("SELECT 1")
+        db_status = "ok"
+    except Exception:
+        db_status = "error"
+
+    try:
+        await redis_client.ping()
+        redis_status = "ok"
+    except Exception:
+        redis_status = "error"
     
     return {
         "database": db_status,
