@@ -1,10 +1,10 @@
 FROM node:18-alpine as builder
 WORKDIR /app
 COPY package*.json ./
-COPY tailwind.config.js ./
-COPY postcss.config.js ./
+COPY *.config.* ./
 COPY vite.config.ts ./
 COPY tsconfig.json ./
+COPY index.html ./
 RUN npm install
 COPY src ./src
 COPY public ./public
