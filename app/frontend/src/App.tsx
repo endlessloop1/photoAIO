@@ -2,7 +2,14 @@ import React from 'react'
 import SystemStatus from './components/SystemStatus'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5000,
+      refetchOnWindowFocus: false,
+    },
+  },
+})
 
 function App() {
   return (

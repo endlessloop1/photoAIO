@@ -1,9 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 
 export default function SystemStatus() {
-  const { data, isLoading, error } = useQuery('systemStatus', () =>
-    fetch('/api/system/status').then(res => res.json())
-  )
+  const { data, isLoading } = useQuery({
+    queryKey: ['systemStatus'],
+    queryFn: () => fetch('/api/system/status').then(res => res.json()),
+  })
+
+  if (isLoading) return <div>Loading...</div>
 
   return (
     <div className="fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg">
