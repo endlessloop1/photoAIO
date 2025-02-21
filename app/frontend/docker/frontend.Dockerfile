@@ -5,9 +5,9 @@ COPY *.config.* ./
 COPY vite.config.ts ./
 COPY tsconfig.json ./
 COPY index.html ./
+COPY public/ ./public/
 RUN npm install
 COPY src ./src
-COPY public ./public || true
 RUN npm run build
 
 FROM node:18-alpine as runtime
