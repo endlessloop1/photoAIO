@@ -3,7 +3,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY *.config.* ./
 COPY vite.config.ts ./
-COPY tsconfig.json ./
+COPY tsconfig*.json ./
 COPY index.html ./
 COPY public/ ./public/
 RUN npm install
