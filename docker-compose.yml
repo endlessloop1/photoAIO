@@ -23,6 +23,11 @@ services:
     build:
       context: ./app/backend
       dockerfile: docker/backend.Dockerfile
+    volumes:
+      - ./app/backend:/app
+      - /app/__pycache__
+      - /app/.pytest_cache
+      - /app/venv
     environment:
       DATABASE_URL: postgresql://photoapp:photoapp@postgres/photodb
       REDIS_URL: redis://redis:6379/0
@@ -36,10 +41,14 @@ services:
     build:
       context: ./app/frontend
       dockerfile: docker/frontend.Dockerfile
+    volumes:
+      - ./app/frontend:/app
+      - /app/node_modules
     ports:
       - "3000:3000"
     environment:
       - VITE_API_BASE_URL=/api
+      - CHOKIDAR_USEPOLLING=true  # For Windows compatibility
     depends_on:
       - backend
     networks:
